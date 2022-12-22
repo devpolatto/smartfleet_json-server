@@ -1,15 +1,19 @@
-FROM node:alpine3.15
-
-RUN sudo su && npm install -g json-server
-
-RUN git clone https://github.com/devpolatto/smartfleet_json-server
-
-RUN mkdir /server
-RUN cd /smartfleet_json-server/
-RUN copy smartfleet_json-server/db.json /server
+FROM node:current-alpine3.17
 
 WORKDIR /server
 
-RUN json-server --watch -p 3333 db.json
+COPY package.json .
+COPY package-lock.json .
 
-EXPOSE 3333
+RUN npm install
+
+RUN npm install -g json-server
+
+COPY db.json /server
+
+WORKDIR /server
+
+EXPOSE 8081
+
+# CMD ["npm", "run", "start"]
+CMD ["json-server", "-w", "-p", "8081", "db.json", "--host", "0.0.0.0"]
